@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EEUEZ MENU — Digitalisez vos menus & commandez via WhatsApp</title>
+  <meta name="description" content="EEUEZ MENU — Transformez les cartes papier en menus digitaux consultables via QR, paiements simulés et commandes par WhatsApp. Démo: Socrate Restaurant, Bastos - Yaoundé." />
+  <meta name="keywords" content="menu digital, QR menu, WhatsApp order, restaurant, EEUEZ MENU, Socrate Restaurant" />
+  <meta name="author" content="EEUEZ MENU">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="EEUEZ MENU — Menus digitaux & commandes WhatsApp" />
+  <meta property="og:description" content="Demo interactive pour Socrate Restaurant - Bastos. Digitalisez vos menus et recevez des commandes via WhatsApp." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://eeuez.example/" />
+  <meta property="og:image" content="https://eeuez.example/og-image.png" />
+
+  <!-- JSON-LD LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "Socrate Restaurant (Demo via EEUEZ MENU)",
+    "telephone": "+237650000000",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Bastos",
+      "addressLocality": "Yaoundé",
+      "addressCountry": "CM"
+    },
+    "url": "https://eeuez.example/",
+    "priceRange": "$$"
+  }
+  </script>
+
+  <style>
+    :root{ --green:#50C878; --black:#0b0b0b; --bg:#ffffff; --muted:#666 }
+    *{box-sizing:border-box}
+    html,body{height:100%;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--black);background:var(--bg);}
+    a{color:inherit}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #eee;position:sticky;top:0;background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));backdrop-filter: blur(6px);z-index:40}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo img{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:10px;background:var(--green);color:#fff;font-weight:700}
+    nav{display:flex;gap:12px;align-items:center}
+    nav a{padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+    nav a.cta{background:var(--green);color:#fff}
+
+    main{padding:28px 20px;max-width:1200px;margin:0 auto}
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:center;padding:40px 0}
+    .hero h1{font-size:clamp(28px,4vw,44px);line-height:1.02;margin:0}
+    .tag{color:var(--muted);margin:14px 0 22px}
+    .actions{display:flex;gap:12px}
+
+    /* phone animation */
+    .phone-anim{width:100%;max-width:380px;margin:0 auto}
+    .phone{width:100%;height:720px;max-height:620px;border-radius:28px;border:10px solid #111;background:linear-gradient(180deg,#0f1720,#071018);position:relative;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.25);transform:translateY(0);transition:transform .45s cubic-bezier(.2,.9,.3,1)}
+    .screen{position:absolute;inset:18px;border-radius:16px;background:#fff;padding:14px;display:flex;flex-direction:column}
+    .menu-sim{flex:1;overflow:auto}
+    .menu-sim .line{height:14px;background:#f2f2f2;margin:10px 0;border-radius:6px}
+    .phone:focus{outline:3px solid rgba(80,200,120,.18)}
+
+    /* demo section */
+    .demo{margin-top:34px;padding:22px;border-radius:12px;border:1px solid #eee}
+    .mode-toggle{display:flex;gap:8px}
+    .mode-toggle button{padding:8px 12px;border-radius:8px;border:1px solid #eee;background:#fff}
+    .mode-toggle button[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+
+    /* menu grid */
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:18px}
+    .card{background:#fff;border-radius:12px;padding:10px;border:1px solid #f0f0f0;display:flex;gap:10px;align-items:center}
+    .thumb{width:86px;height:76px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;background:#fafafa}
+    .card h4{margin:0;font-size:15px}
+    .price{font-weight:700;color:var(--green)}
+    .qty{margin-left:auto;display:flex;align-items:center;gap:8px}
+    .btn{padding:6px 8px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+
+    /* floating cart */
+    .cart{position:fixed;right:18px;bottom:18px;background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.12);display:flex;gap:10px;align-items:center;z-index:60}
+    .cart .count{background:var(--green);color:#fff;padding:6px 8px;border-radius:10px;font-weight:700}
+
+    /* modal */
+    .modal-back{position:fixed;inset:0;background:rgba(6,6,6,.45);display:none;align-items:center;justify-content:center;z-index:100}
+    .modal{background:#fff;border-radius:12px;padding:20px;max-width:520px;width:96%;box-shadow:0 16px 40px rgba(0,0,0,.2)}
+    .row{display:flex;gap:12px;align-items:center}
+
+    /* footer */
+    footer{margin-top:40px;padding:30px 0;border-top:1px solid #eee}
+    .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+
+    /* small screens */
+
+    /* Responsive tweaks */
+    @media (max-width:768px){
+      .hero{grid-template-columns:1fr}
+      nav{gap:6px}
+      .phone-anim{max-width:260px}
+    }
+    @media (max-width:480px){
+      header{flex-direction:column;align-items:flex-start;gap:8px}
+      nav{width:100%;justify-content:flex-start;flex-wrap:wrap}
+      .hero h1{font-size:20px}
+      .actions a{flex:1;text-align:center}
+      .menu-grid{grid-template-columns:1fr}
+    }
+    /* micro interactions */
+    .fade-in{animation:fadeIn .6s ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+    /* accessibility focus */
+    button:focus, a:focus{outline:3px solid rgba(80,200,120,.18);outline-offset:2px}
+
+    /* small tweaks for TV/large displays */
+    @media (min-width:1700px){ main{max-width:1500px} .hero{padding:80px 0}} 
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><img src="logo.jpg"></div>
+      <div>
+        <div style="font-weight:800">EEUEZ MENU</div>
+        <div style="font-size:12px;color:var(--muted)">Menus digitaux • QR → WhatsApp</div>
+      </div>
+    </div>
+    <nav role="navigation" aria-label="Navigation principale">
+      <a href="#demo">Démo</a>
+      <a href="#pricing">Tarifs</a>
+      <a href="#docs">Documentation</a>
+      <a href="#contact" class="cta">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <h1 id="hero-title">Digitalisez votre carte. Recevez des commandes via WhatsApp.</h1>
+        <p class="tag">EEUEZ MENU transforme vos tables en caisses : QR codes, menu interactif, panier et message WhatsApp formaté — prêt à être reçu.</p>
+        <div class="actions">
+          <a class="cta" href="#demo" role="button">Voir la démo</a>
+          <a href="#pricing" role="button" style="padding:8px 12px;border-radius:8px;border:1px solid #eee">Voir les tarifs</a>
+        </div>
+
+        <div style="margin-top:18px;color:var(--muted);font-size:14px">Démo: <strong>Socrate Restaurant</strong> — Bastos, Yaoundé</div>
+      </div>
+
+      <div class="phone-anim" aria-hidden="true">
+        <div class="phone" tabindex="0">
+          <div class="screen">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:44px;height:44px;border-radius:8px;background:var(--green);display:grid;place-items:center;color:#fff;font-weight:700">SR</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Socrate Restaurant</div>
+                <div style="font-size:12px;color:var(--muted)">Bastos - Yaoundé</div>
+              </div>
+            </div>
+            <div class="menu-sim" style="margin-top:12px">
+              <div class="line"></div>
+              <div class="line" style="width:85%"></div>
+              <div class="line" style="width:70%"></div>
+              <div class="line" style="width:92%"></div>
+              <div class="line" style="width:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="demo" aria-labelledby="demo-title">
+      <h2 id="demo-title">Démo interactive — Socrate Restaurant</h2>
+      <p style="color:var(--muted)">Choisissez le mode et testez le parcours client. Le message final s'ouvrira dans WhatsApp (simulateur).</p>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px">
+        <div class="mode-toggle" role="tablist" aria-label="Mode de commande">
+          <button id="mode-dine" aria-pressed="true" role="tab">Sur place</button>
+          <button id="mode-delivery" aria-pressed="false" role="tab">À domicile</button>
+        </div>
+
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <label for="tableId">Table ID: </label>
+          <input id="tableId" aria-label="Identifiant de table" placeholder="Ex: 12" style="padding:8px;border-radius:8px;border:1px solid #eee;width:94px">
+        </div>
+      </div>
+
+      <div id="deliveryForm" style="margin-top:14px;display:none;border-top:1px dashed #eee;padding-top:12px">
+        <form id="addrForm">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input name="country" placeholder="Pays" aria-label="Pays" required style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+            <input name="city" placeholder="Ville" aria-label="Ville" required style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+            <input name="neighborhood" placeholder="Quartier" aria-label="Quartier" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+            <input name="name" placeholder="Nom complet" aria-label="Nom complet" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+            <input name="phone" placeholder="Téléphone" aria-label="Téléphone" required style="flex:1;padding:8px;border-radius:8px;border:1px solid #eee">
+          </div>
+        </form>
+      </div>
+
+      <div class="menu-grid fade-in" id="menuGrid" aria-live="polite" style="margin-top:18px">
+        <!-- JS inserts menu items -->
+      </div>
+
+    </section>
+
+    <section id="pricing" style="margin-top:26px">
+      <h2>Tarifs</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
+        <div style="padding:16px;border-radius:12px;border:1px solid #eee">
+          <h3>Starter</h3>
+          <p style="color:var(--muted)">1 menu, QR basique, support WhatsApp</p>
+          <div style="font-weight:800;font-size:18px;margin-top:8px">3 000 FCFA / mois</div>
+        </div>
+        <div style="padding:16px;border-radius:12px;border:1px solid #eee;background:linear-gradient(180deg,rgba(80,200,120,.05),#fff)">
+          <h3>Pro</h3>
+          <p style="color:var(--muted)">Menus illimités, analytics, intégration Momo</p>
+          <div style="font-weight:800;font-size:18px;margin-top:8px">8 000 FCFA / mois</div>
+        </div>
+        <div style="padding:16px;border-radius:12px;border:1px solid #eee">
+          <h3>Entreprise</h3>
+          <p style="color:var(--muted)">SLA, multi-location, support dédié</p>
+          <div style="font-weight:800;font-size:18px;margin-top:8px">Sur devis</div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section id="contact" style="margin-top:28px">
+      <h2>Contact</h2>
+      <p>Pour une intégration, envoyez-nous un message ou réservez une démo.</p>
+      <form id="contactForm" aria-label="Formulaire de contact">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input name="name" placeholder="Nom" required style="flex:1;padding:10px;border-radius:8px;border:1px solid #eee">
+          <input name="email" type="email" placeholder="Email" required style="flex:1;padding:10px;border-radius:8px;border:1px solid #eee">
+          <input name="phone" placeholder="Téléphone" style="flex:1;padding:10px;border-radius:8px;border:1px solid #eee">
+          <textarea name="message" placeholder="Message" rows="3" style="flex:1;padding:10px;border-radius:8px;border:1px solid #eee"></textarea>
+        </div>
+        <div style="margin-top:8px">
+          <button type="submit" class="btn">Envoyer</button>
+        </div>
+      </form>
+    </section>
+
+    <footer role="contentinfo">
+      <div class="grid-3">
+        <div>
+          <strong>EEUEZ MENU</strong>
+          <p style="color:var(--muted)">Menus digitaux • QR → WhatsApp</p>
+        </div>
+        <div>
+          <strong>Adresse</strong>
+          <p style="color:var(--muted)">Bastos, Yaoundé</p>
+        </div>
+        <div>
+          <strong>Réseaux</strong>
+          <p style="color:var(--muted)">WhatsApp: +237650000000</p>
+        </div>
+      </div>
+      <div style="margin-top:18px;color:var(--muted);font-size:13px">© <span id="year"></span> EEUEZ MENU — SEO friendly • Accessible</div>
+    </footer>
+  </main>
+
+  <!-- Floating cart -->
+  <div class="cart" role="status" aria-live="polite" id="cart" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-weight:700">Panier</div>
+      <div class="count" id="cartCount">0</div>
+    </div>
+    <div id="cartTotal" style="font-weight:700">0 FCFA</div>
+    <button id="checkoutBtn" class="btn" aria-haspopup="dialog">Commander</button>
+  </div>
+
+  <!-- modal -->
+  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div id="modalContent"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="modalClose" class="btn">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Data demo ---
+    const RESTAURANT_WHATSAPP = '+237650000000'; // change to real number in integration
+    const DELIVERY_FEE = 1500; // FCFA
+
+    const menu = [
+      {id: 'poulet-dg', name: 'Poulet DG', price: 4000, img: thumbSVG('Poulet')},
+      {id: 'poisson-braise', name: 'Poisson braisé', price: 4500, img: thumbSVG('Poisson')},
+      {id: 'jus-ananas', name: 'Jus Ananas', price: 1500, img: thumbSVG('Jus')},
+      {id: 'beignet', name: 'Beignet', price: 500, img: thumbSVG('Beignet')}
+    ];
+
+    // Accessibility: focus trap helpers (minimal)
+    function trapFocus(modal){
+      const focusable = modal.querySelectorAll('button, [href], input, textarea, select');
+      const first = focusable[0], last = focusable[focusable.length-1];
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Tab'){
+          if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+          else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      }, {once:true});
+    }
+
+    function thumbSVG(text){
+      const svg = `<svg width="86" height="76" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${text}"><rect width="86" height="76" rx="8" fill="#f4f4f4"></rect><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#999" font-family="Arial" font-size="12">${text}</text></svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    function formatFCFA(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA'; }
+
+    // render menu
+    const menuGrid = document.getElementById('menuGrid');
+    const cart = {};
+
+    function renderMenu(){
+      menuGrid.innerHTML = '';
+      for(const item of menu){
+        const el = document.createElement('article'); el.className='card'; el.setAttribute('tabindex','0');
+        el.innerHTML = `
+          <div class="thumb"><img src="${item.img}" alt="${item.name}" width="86" height="76"></div>
+          <div>
+            <h4>${item.name}</h4>
+            <div class="price">${formatFCFA(item.price)}</div>
+          </div>
+          <div class="qty" aria-label="Quantité pour ${item.name}">
+            <button class="btn minus" data-id="${item.id}" aria-label="Retirer 1">−</button>
+            <div id="q-${item.id}">0</div>
+            <button class="btn plus" data-id="${item.id}" aria-label="Ajouter 1">+</button>
+          </div>
+        `;
+        menuGrid.appendChild(el);
+      }
+    }
+
+    renderMenu();
+
+    // attach listeners
+    menuGrid.addEventListener('click', (e)=>{
+      const plus = e.target.closest('.plus');
+      const minus = e.target.closest('.minus');
+      if(plus){ changeQty(plus.dataset.id, 1); }
+      if(minus){ changeQty(minus.dataset.id, -1); }
+    });
+
+    function changeQty(id, delta){
+      const item = menu.find(m=>m.id===id);
+      if(!item) return;
+      cart[id] = cart[id] || { ...item, qty:0 };
+      cart[id].qty = Math.max(0, cart[id].qty + delta);
+      document.getElementById('q-'+id).innerText = cart[id].qty;
+      updateCartUI();
+    }
+
+    function updateCartUI(){
+      const cartEl = document.getElementById('cart');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+      const totalQty = Object.values(cart).reduce((s,i)=>s+i.qty,0);
+      const totalPrice = Object.values(cart).reduce((s,i)=>s+i.qty*i.price,0);
+      if(totalQty>0){ cartEl.style.display='flex'; } else { cartEl.style.display='none'; }
+      cartCount.innerText = totalQty;
+      cartTotal.innerText = formatFCFA(totalPrice);
+    }
+
+    document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
+
+    // mode toggle & table param
+    const btnDine = document.getElementById('mode-dine');
+    const btnDel = document.getElementById('mode-delivery');
+    const deliveryForm = document.getElementById('deliveryForm');
+    const addrForm = document.getElementById('addrForm');
+
+    btnDine.addEventListener('click', ()=>{ setMode('dine'); });
+    btnDel.addEventListener('click', ()=>{ setMode('delivery'); });
+
+    function setMode(mode){
+      const dine = (mode==='dine');
+      btnDine.setAttribute('aria-pressed', dine);
+      btnDel.setAttribute('aria-pressed', !dine);
+      deliveryForm.style.display = dine ? 'none' : 'block';
+    }
+
+    // read ?table param
+    const params = new URLSearchParams(location.search);
+    if(params.has('table')){ document.getElementById('tableId').value = params.get('table'); }
+
+    // open checkout
+    function openCheckout(){
+      const modalBack = document.getElementById('modalBack');
+      const modalContent = document.getElementById('modalContent');
+      const items = Object.values(cart).filter(i=>i.qty>0);
+      if(items.length===0){ alert('Votre panier est vide.'); return; }
+
+      const modeDelivery = btnDel.getAttribute('aria-pressed') === 'true';
+      const tableId = document.getElementById('tableId').value || null;
+      const addr = {};
+      if(modeDelivery){
+        const fd = new FormData(addrForm);
+        addr.country = fd.get('country'); addr.city = fd.get('city'); addr.neighborhood = fd.get('neighborhood'); addr.name = fd.get('name'); addr.phone = fd.get('phone');
+        // simple validation
+        if(!addr.country || !addr.city || !addr.name || !addr.phone){ alert('Complétez le formulaire de livraison.'); return; }
+      }
+
+      // build order summary
+      let subtotal = items.reduce((s,i)=>s+i.qty*i.price,0);
+      let deliveryFee = modeDelivery ? DELIVERY_FEE : 0;
+      let grand = subtotal + deliveryFee;
+
+      modalContent.innerHTML = `
+        <h3>Récapitulatif de votre commande</h3>
+        <div style="max-height:240px;overflow:auto;margin-top:8px">
+          ${items.map(it=>`<div style=\"display:flex;justify-content:space-between;padding:6px 0\"><div>${it.qty} × ${it.name}</div><div>${formatFCFA(it.qty*it.price)}</div></div>`).join('')}
+        </div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between"><div>Sous-total</div><div>${formatFCFA(subtotal)}</div></div>
+        <div style="display:flex;justify-content:space-between"><div>Livraison</div><div>${formatFCFA(deliveryFee)}</div></div>
+        <div style="font-weight:800;display:flex;justify-content:space-between;margin-top:10px"><div>Total</div><div>${formatFCFA(grand)}</div></div>
+
+        <div style="margin-top:12px">Choix paiement:</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="payCash" class="btn">Cash</button>
+          <button id="payMomo" class="btn">Mtn Momo</button>
+          <button id="payOrange" class="btn">Orange Money</button>
+        </div>
+      `;
+
+      // show modal
+      modalBack.style.display='flex'; modalBack.setAttribute('aria-hidden','false');
+
+      // payment simulation
+      document.getElementById('payCash').addEventListener('click', ()=>finalizeOrder('Cash', items, grand, tableId, addr));
+      document.getElementById('payMomo').addEventListener('click', ()=>simulatePayment('Mtn Momo', ()=>finalizeOrder('Mtn Momo', items, grand, tableId, addr)));
+      document.getElementById('payOrange').addEventListener('click', ()=>simulatePayment('Orange Money', ()=>finalizeOrder('Orange Money', items, grand, tableId, addr)));
+
+      document.getElementById('modalClose').addEventListener('click', closeModal);
+      trapFocus(document.querySelector('.modal'));
+    }
+
+    function closeModal(){ const mb = document.getElementById('modalBack'); mb.style.display='none'; mb.setAttribute('aria-hidden','true'); }
+
+    function simulatePayment(method, cb){
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML += `<div style=\"margin-top:12px\"><div role=\"status\">Paiement en cours via ${method} ... <span id=\"spinner\">🔄</span></div></div>`;
+      const spinner = document.getElementById('spinner');
+      // simulate short delay
+      setTimeout(()=>{ spinner.textContent = '✅'; cb(); }, 1600 + Math.random()*1400);
+    }
+
+    function finalizeOrder(paymentMethod, items, total, tableId, addr){
+      // generate order number
+      const orderNo = 'EE' + Math.floor(Math.random()*900000+100000);
+
+      // build message
+      let text = `Commande ${orderNo} - Socrate Restaurant (Démo)\n`;
+      if(tableId) text += `Table: ${tableId}\n`;
+      if(addr && addr.name){ text += `Livraison pour: ${addr.name} - ${addr.phone} - ${addr.city}, ${addr.neighborhood || ''}, ${addr.country}\n` }
+      text += '-----\n';
+      for(const it of items){ text += `${it.qty} x ${it.name} — ${it.qty*it.price} FCFA\n`; }
+      text += '-----\n';
+      text += `Livraison: ${formatFCFA(btnDel.getAttribute('aria-pressed')==='true'? DELIVERY_FEE:0)}\n`;
+      text += `Total: ${formatFCFA(total)}\n`;
+      text += `Paiement: ${paymentMethod}\n`;
+      text += 'Merci!';
+
+      // encode message for whatsapp link
+      const encoded = encodeURIComponent(text);
+      const phone = RESTAURANT_WHATSAPP.replace(/[\s+\-()]/g,'');
+      const wa = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+
+      // show confirmation modal
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <h3>Commande confirmée 🎉</h3>
+        <p>Numéro de commande: <strong>${orderNo}</strong></p>
+        <p>Total: <strong>${formatFCFA(total)}</strong></p>
+        <p><a href="${wa}" target="_blank" rel="noopener">Ouvrir sur WhatsApp</a> (ouvre la conversation avec le restaurant)</p>
+      `;
+
+      // clear cart
+      for(const k in cart) delete cart[k];
+      setTimeout(()=>{ renderMenu(); updateCartUI(); }, 60);
+    }
+
+    // contact form simple handler
+    document.getElementById('contactForm').addEventListener('submit', (e)=>{ e.preventDefault(); alert('Merci! Nous avons reçu votre message (démo).'); e.target.reset(); });
+
+    // footer year
+    document.getElementById('year').innerText = new Date().getFullYear();
+
+    // close modal on backdrop click
+    document.getElementById('modalBack').addEventListener('click', (e)=>{ if(e.target.id === 'modalBack') closeModal(); });
+
+    // keyboard: Esc to close modal
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+    // small enhancement: allow direct ?table= and focus
+    document.getElementById('tableId').addEventListener('input', (e)=>{ if(e.target.value) e.target.setAttribute('aria-label', 'Table '+e.target.value); else e.target.setAttribute('aria-label','Identifiant de table'); });
+
+    // initial update
+    updateCartUI();
+
+  </script>
+</body>
+</html>
